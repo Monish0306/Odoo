@@ -22,12 +22,14 @@ const organizationRoutes = require('./routes/organization');
 const assetRoutes = require('./routes/assets');
 const allocationRoutes = require('./routes/allocations');
 const transferRoutes = require('./routes/transfers');
+const bookingRoutes = require('./routes/bookings');
 
 app.use('/auth', authRoutes);
 app.use('/', organizationRoutes);
 app.use('/', assetRoutes);
 app.use('/', allocationRoutes);
 app.use('/', transferRoutes);
+app.use('/bookings', bookingRoutes);
 
 // Health check
 app.get('/', (req, res) => {
