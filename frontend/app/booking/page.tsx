@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import RippleButton from '@/components/RippleButton';
@@ -8,19 +8,19 @@ import RippleButton from '@/components/RippleButton';
 const timeSlots = ['9:00', '10:00', '11:00', '12:00', '1:00'];
 
 export default function Booking() {
-  const bookedVariants = {
+  const bookedVariants: Variants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: {
       opacity: 1,
       scale: 1,
       transition: {
         duration: 0.4,
-        ease: 'easeOut',
+        ease: 'easeOut' as const,
       },
     },
   };
 
-  const conflictVariants = {
+  const conflictVariants: Variants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: {
       opacity: 1,
@@ -28,7 +28,7 @@ export default function Booking() {
       transition: {
         duration: 0.4,
         delay: 0.15,
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 400,
         damping: 20,
       },

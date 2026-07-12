@@ -13,13 +13,16 @@ interface RippleButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
+  disabled?: boolean;
 }
 
-const RippleButton = ({ children, onClick, className = '' }: RippleButtonProps) => {
+const RippleButton = ({ children, onClick, className = '', disabled = false }: RippleButtonProps) => {
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const ref = useRef<HTMLButtonElement>(null);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (disabled) return;
+
     const button = ref.current;
     if (!button) return;
 
@@ -39,7 +42,12 @@ const RippleButton = ({ children, onClick, className = '' }: RippleButtonProps) 
   };
 
   return (
-    <button ref={ref} onClick={handleClick} className={`relative overflow-hidden ${className}`}>
+    <button
+      ref={ref}
+      onClick={handleClick}
+      disabled={disabled}
+      className={`relative overflow-hidden ${className}`}
+    >
       {ripples.map((ripple) => (
         <motion.div
           key={ripple.id}

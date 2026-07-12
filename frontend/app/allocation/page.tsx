@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import RippleButton from '@/components/RippleButton';
@@ -19,7 +19,7 @@ export default function Allocation() {
     setTimeout(() => setIsSubmitting(false), 600);
   };
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
@@ -31,19 +31,19 @@ export default function Allocation() {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, x: -20 },
     visible: { opacity: 1, x: 0 },
   };
 
-  const shakeVariants = {
+  const shakeVariants: Variants = {
     hidden: { opacity: 0, scale: 0.97 },
     visible: {
       opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 500,
         damping: 25,
       },
