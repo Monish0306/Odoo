@@ -143,13 +143,13 @@ export default function Notifications() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0f172a] text-slate-100">
+    <div className="flex min-h-screen bg-[#F5F5ED]">
       <Sidebar />
       <main className="flex-1 p-6 md:p-8">
         <div className="mx-auto max-w-7xl">
           <Header title="Activity Log & Notifications" subtitle="Stay informed on approvals, bookings, alerts, and asset updates" />
 
-          <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-sm">
+          <div className="mb-6 rounded-2xl border border-[#7AAACE]/20 bg-white p-5 shadow-sm">
             <NotificationHeader unreadCount={unreadCount} onMarkAllRead={markAllRead} />
             <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <NotificationTabs activeTab={activeTab} onChange={setActiveTab} />

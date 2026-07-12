@@ -21,8 +21,8 @@ const NotificationTabs = ({ activeTab, onChange }: NotificationTabsProps) => {
           onClick={() => onChange(tab.value)}
           className={`rounded-full px-4 py-2 text-sm font-medium transition ${
             activeTab === tab.value
-              ? 'bg-sky-500 text-white'
-              : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+              ? 'bg-[#2E4F66] text-white'
+              : 'bg-white border border-[#7AAACE]/20 text-[#2E4F66] hover:bg-[#F5F5ED]'
           }`}
         >
           {tab.label}

@@ -27,9 +27,9 @@ const priorityClasses: Record<NotificationItem['priority'], string> = {
 
 const NotificationCard = ({ item, onMarkRead }: NotificationCardProps) => {
   return (
-    <article className={`rounded-2xl border p-4 shadow-sm ${item.unread ? 'border-sky-500/40 bg-slate-900' : 'border-slate-800 bg-slate-900/70'}`}>
+    <article className={`rounded-2xl border p-4 shadow-sm ${item.unread ? 'border-sky-500/30 bg-[#F5F5ED]' : 'border-[#7AAACE]/20 bg-white'}`}>
       <div className="flex items-start gap-3">
-        <div className={`mt-0.5 rounded-xl p-2 ${item.unread ? 'bg-sky-500/15 text-sky-400' : 'bg-slate-800 text-slate-400'}`}>
+        <div className={`mt-0.5 rounded-xl p-2 ${item.unread ? 'bg-sky-500/10 text-sky-500' : 'bg-[#EAF6FF] text-[#2E4F66]'}`}>
           {iconMap[item.type]}
         </div>
 
@@ -37,24 +37,24 @@ const NotificationCard = ({ item, onMarkRead }: NotificationCardProps) => {
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-white">{item.title}</h3>
-                {item.unread && <span className="h-2.5 w-2.5 rounded-full bg-sky-400" />}
+                <h3 className="text-sm font-semibold text-[#2E4F66]">{item.title}</h3>
+                {item.unread && <span className="h-2.5 w-2.5 rounded-full bg-sky-500" />}
               </div>
-              <p className="mt-1 text-sm text-slate-400">{item.description}</p>
+              <p className="mt-1 text-sm text-gray-600">{item.description}</p>
             </div>
             <button
               onClick={() => onMarkRead(item.id)}
-              className="rounded-full border border-slate-700 px-3 py-1 text-xs font-medium text-slate-300 transition hover:border-sky-500 hover:text-white"
+              className="rounded-full border border-[#7AAACE]/20 bg-white px-3 py-1 text-xs font-medium text-[#2E4F66] transition hover:bg-[#F5F5ED]"
             >
               Mark Read
             </button>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-500">
             <span>{item.timestamp}</span>
             <div className="flex items-center gap-3">
               <span className={`font-medium ${priorityClasses[item.priority]}`}>{item.priority} Priority</span>
-              <span className="rounded-full bg-slate-800 px-2.5 py-1 text-slate-300">{item.type}</span>
+              <span className="rounded-full bg-[#F5F5ED] px-2.5 py-1 text-sm text-[#2E4F66]">{item.type}</span>
             </div>
           </div>
         </div>
