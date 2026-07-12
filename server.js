@@ -13,18 +13,9 @@ app.use(express.json());
 
 // Routes
 const authRoutes = require('./routes/auth');
-const organizationRoutes = require('./routes/organization');
-const assetRoutes = require('./routes/assets');
-const allocationRoutes = require('./routes/allocations');
-const transferRoutes = require('./routes/transfers');
-
 app.use('/auth', authRoutes);
-app.use('/', organizationRoutes);
-app.use('/', assetRoutes);
-app.use('/', allocationRoutes);
-app.use('/', transferRoutes);
 
-// Health check
+// Basic health check route
 app.get('/', (req, res) => {
   res.json({ data: { message: 'AssetFlow API is running' }, error: null });
 });
