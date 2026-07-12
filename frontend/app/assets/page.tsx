@@ -27,8 +27,8 @@ export default function Assets() {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
-        staggerChildren: 0.05,
+        duration: 0.5,
+        staggerChildren: 0.04,
       },
     },
   };
@@ -45,7 +45,7 @@ export default function Assets() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
         >
           <Header
             title="Assets"
@@ -54,32 +54,32 @@ export default function Assets() {
 
           {/* Search and Register */}
           <motion.div
-            className="flex gap-4 mb-6"
+            className="flex gap-3 mb-6"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.6 }}
+            transition={{ delay: 0.08, duration: 0.4 }}
           >
             <input
               type="text"
               placeholder="Search by tag, serial, or QR code…"
-              className="flex-1 px-4 py-3 bg-white border border-[#7AAACE]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9ED8FF]"
+              className="flex-1 px-4 py-2.5 bg-white border border-[#7AAACE]/20 rounded-lg text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#9ED8FF] focus:border-transparent transition-all duration-200"
             />
-            <RippleButton className="px-6 py-3 bg-[#2E4F66] text-white rounded-lg hover:bg-[#1a2f42] transition-colors font-medium">
+            <RippleButton className="px-5 py-2.5 bg-[#2E4F66] text-white text-sm font-medium rounded-lg hover:bg-[#1a2f42] hover:shadow-sm transition-all duration-200">
               + Register Asset
             </RippleButton>
           </motion.div>
 
           {/* Filter Pills */}
           <motion.div
-            className="flex gap-3 mb-8"
+            className="flex gap-2 mb-10"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.6 }}
+            transition={{ delay: 0.12, duration: 0.4 }}
           >
             {['Category', 'Status', 'Department'].map((filter, i) => (
               <RippleButton
                 key={i}
-                className="px-4 py-2 bg-white border border-[#7AAACE]/20 text-[#2E4F66] rounded-lg hover:border-[#7AAACE]/40 transition-colors text-sm font-medium"
+                className="px-3.5 py-2 bg-white border border-[#7AAACE]/20 text-[#2E4F66] rounded-lg hover:border-[#7AAACE]/60 hover:bg-[#F5F5ED] transition-all duration-200 text-xs font-medium"
               >
                 {filter}
               </RippleButton>
@@ -97,30 +97,30 @@ export default function Assets() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#7AAACE]/20 bg-[#F5F5ED]">
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Tag</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Name</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Category</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Status</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Location</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Tag</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Name</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Category</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Status</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Location</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#7AAACE]/20">
+                <tbody className="divide-y divide-[#7AAACE]/10">
                   {[0, 1, 2].map((i) => (
                     <tr key={i} className="px-6 py-4">
                       <td className="px-6 py-4">
-                        <div className="h-4 bg-gray-300 rounded animate-pulse w-16"></div>
+                        <div className="h-3 bg-gray-200 rounded animate-pulse w-14"></div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="h-4 bg-gray-300 rounded animate-pulse w-24"></div>
+                        <div className="h-3 bg-gray-200 rounded animate-pulse w-20"></div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="h-4 bg-gray-300 rounded animate-pulse w-20"></div>
+                        <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="h-4 bg-gray-300 rounded animate-pulse w-20"></div>
+                        <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="h-4 bg-gray-300 rounded animate-pulse w-24"></div>
+                        <div className="h-3 bg-gray-200 rounded animate-pulse w-20"></div>
                       </td>
                     </tr>
                   ))}
@@ -132,28 +132,28 @@ export default function Assets() {
               className="bg-white border border-[#7AAACE]/20 rounded-lg overflow-hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.3 }}
             >
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#7AAACE]/20 bg-[#F5F5ED]">
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Tag</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Name</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Category</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Status</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Location</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Tag</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Name</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Category</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Status</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Location</th>
                   </tr>
                 </thead>
                 <motion.tbody
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
-                  className="divide-y divide-[#7AAACE]/20"
+                  className="divide-y divide-[#7AAACE]/10"
                 >
                   {assetData.map((asset, index) => (
                     <motion.tr
                       key={index}
-                      className="hover:bg-[#F5F5ED] transition-colors border-l-2 border-l-transparent hover:border-l-[#9ED8FF]"
+                      className="hover:bg-[#F5F5ED]/60 transition-colors duration-150 border-l-2 border-l-transparent hover:border-l-[#9ED8FF]"
                       variants={rowVariants}
                     >
                       <td className="px-6 py-4 text-sm font-medium text-[#2E4F66]">{asset.tag}</td>

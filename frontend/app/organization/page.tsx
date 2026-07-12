@@ -23,8 +23,8 @@ export default function Organization() {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
-        staggerChildren: 0.05,
+        duration: 0.5,
+        staggerChildren: 0.04,
       },
     },
   };
@@ -47,7 +47,7 @@ export default function Organization() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
         >
           <Header
             title="Organization setup"
@@ -55,25 +55,25 @@ export default function Organization() {
           />
 
           {/* Tabs and Add Button */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-10">
             {/* Tabs */}
-            <div className="flex gap-2">
+            <div className="flex gap-1">
               {tabs.map((tab) => (
                 <motion.button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-lg transition-colors relative ${
+                  className={`px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium relative ${
                     activeTab === tab
-                      ? 'text-[#2E4F66] font-semibold'
-                      : 'text-gray-600 hover:text-gray-800'
+                      ? 'text-[#2E4F66]'
+                      : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   {tab}
                   {activeTab === tab && (
                     <motion.div
                       layoutId="tabIndicator"
-                      className="absolute bottom-0 left-0 right-0 h-1 bg-[#2E4F66] rounded-full"
-                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2E4F66] rounded-full"
+                      transition={{ type: 'spring', stiffness: 380, damping: 25 }}
                     />
                   )}
                 </motion.button>
@@ -81,7 +81,7 @@ export default function Organization() {
             </div>
 
             {/* Add Button */}
-            <RippleButton className="px-4 py-2 bg-[#2E4F66] text-white rounded-lg hover:bg-[#1a2f42] transition-colors">
+            <RippleButton className="px-4 py-2.5 bg-[#2E4F66] text-white text-sm font-medium rounded-lg hover:bg-[#1a2f42] hover:shadow-sm transition-all duration-200">
               + Add
             </RippleButton>
           </div>
@@ -91,32 +91,32 @@ export default function Organization() {
             className="bg-white border border-[#7AAACE]/20 rounded-lg overflow-hidden"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
+            transition={{ delay: 0.15, duration: 0.4 }}
           >
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[#7AAACE]/20 bg-[#F5F5ED]">
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Department</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Head</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Parent Dept</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66]">Status</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Department</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Head</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Parent Dept</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#2E4F66] uppercase tracking-wide">Status</th>
                 </tr>
               </thead>
               <motion.tbody
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="divide-y divide-[#7AAACE]/20"
+                className="divide-y divide-[#7AAACE]/10"
               >
                 {departmentData.map((row, index) => (
                   <motion.tr
                     key={index}
-                    className="hover:bg-[#F5F5ED] transition-colors"
+                    className="hover:bg-[#F5F5ED]/60 transition-colors duration-150"
                     variants={rowVariants}
                   >
-                    <td className="px-6 py-4 text-sm text-gray-700">{row.department}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700 font-medium">{row.department}</td>
                     <td className="px-6 py-4 text-sm text-gray-700">{row.head}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700">{row.parentDept}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{row.parentDept}</td>
                     <td className="px-6 py-4 text-sm">
                       <StatusPill status={mapStatusToPill(row.status)} />
                     </td>
@@ -128,10 +128,10 @@ export default function Organization() {
 
           {/* Caption */}
           <motion.p
-            className="text-xs text-gray-600 mt-4"
+            className="text-xs text-gray-500 mt-4 font-medium"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
+            transition={{ delay: 0.4, duration: 0.4 }}
           >
             Editing a department here also updates the picklist on Assets and Allocation & Transfer.
           </motion.p>

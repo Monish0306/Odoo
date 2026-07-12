@@ -49,14 +49,6 @@ export default function Maintenance() {
     visible: { opacity: 1, y: 0 },
   };
 
-  const resolvedCardVariants = {
-    initial: { backgroundColor: '#FFFFFF' },
-    resolved: {
-      backgroundColor: '#F0FDF4',
-      transition: { duration: 0.4, ease: 'easeInOut' },
-    },
-  };
-
   return (
     <div className="flex min-h-screen bg-[#F5F5ED]">
       <Sidebar />
@@ -76,15 +68,15 @@ export default function Maintenance() {
             className="grid grid-cols-5 gap-6 mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
+            transition={{ delay: 0.08, duration: 0.4 }}
           >
             {Object.entries(columnConfig).map(([columnKey, columnMeta]) => {
               const columnCards = getCardsByColumn(columnKey as MaintenanceCard['column']);
               const isResolved = columnKey === 'resolved';
 
               return (
-                <div key={columnKey} className="bg-white border border-[#7AAACE]/20 rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-[#2E4F66] mb-4" style={{ fontFamily: 'Sentient, serif' }}>
+                <div key={columnKey} className="bg-white border border-[#7AAACE]/20 rounded-lg p-5">
+                  <h3 className="text-sm font-semibold text-[#2E4F66] mb-5 tracking-tight" style={{ fontFamily: 'Sentient, serif' }}>
                     {columnMeta.title}
                   </h3>
 
@@ -109,14 +101,14 @@ export default function Maintenance() {
                             initial="hidden"
                             animate="visible"
                             exit="hidden"
-                            className={`p-3 rounded-lg border border-[#7AAACE]/20 ${
-                              isResolved ? 'bg-emerald-50' : 'bg-white'
+                            className={`p-3.5 rounded-lg border border-[#7AAACE]/20 transition-colors duration-200 ${
+                              isResolved ? 'bg-emerald-50 hover:bg-emerald-100/50' : 'bg-white hover:bg-[#F5F5ED]'
                             }`}
                           >
                             <p className="text-xs font-semibold text-[#2E4F66]">{card.tag}</p>
-                            <p className="text-xs text-gray-600 mt-1">{card.description}</p>
+                            <p className="text-xs text-gray-600 mt-2 leading-relaxed">{card.description}</p>
                             {card.resolvedDate && (
-                              <p className="text-xs text-emerald-600 mt-2">✓ {card.resolvedDate}</p>
+                              <p className="text-xs text-emerald-600 mt-2 font-medium">✓ {card.resolvedDate}</p>
                             )}
                           </motion.div>
                         </Reorder.Item>
@@ -130,10 +122,10 @@ export default function Maintenance() {
 
           {/* Caption */}
           <motion.p
-            className="text-xs text-gray-600"
+            className="text-xs text-gray-500 font-medium"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
           >
             Approving a card moves the asset to Under maintenance. Resolving returns it to Available.
           </motion.p>
