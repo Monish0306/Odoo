@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Department {
+  id           String   @id @default(cuid())
+  name         String
+  headId       String?
+  head         Employee? @relation("DeptHead", fields: [headId], references: [id])
+  parentDeptId String?
+  parentDept   Department? @relation("DeptHierarchy", fields: [parentDeptId], references: [id])
+  childDepts   Department[] @relation("DeptHierarchy")
+  status       String   @default("Active")
+  employees    Employee[] @relation("EmployeeDept")
+  assets       Asset[]
+}
+
+model Category {
+  id           String   @id @default(cuid())
+  name         String
+  customFields Json?
+  assets       Asset[]
+}
+
+model Employee {
+  id             String   @id @default(cuid())
+  name           String
+  email          String   @unique
+  passwordHash   String
+  departmentId   String?
+  department     Department? @relation("EmployeeDept", fields: [departmentId], references: [id])
+  role           String   @default("Employee") // Employee, DeptHead, AssetManager, Admin
+  status         String   @default("Active")
+  headOf         Department[] @relation("DeptHead")
+  allocations    Allocation[]
+  createdAt      DateTime @default(now())
+}
+
+model Asset {
+  id             String   @id @default(cuid())
+  tag            String   @unique
+  name           String
+  categoryId     String
+  category       Category @relation(fields: [categoryId], references: [id])
+  serialNumber   String?
+  acquisitionDate DateTime?
+  acquisitionCost Float?
+  condition      String?
+  location       String?
+  photoUrl       String?
+  isBookable     Boolean  @default(false)
+  status         String   @default("Available")
+  departmentId   String?
+  department     Department? @relation(fields: [departmentId], references: [id])
+  allocations    Allocation[]
+  transfers      TransferRequest[]
+  createdAt      DateTime @default(now())
+}
+
+model Allocation {
+  id                 String   @id @default(cuid())
+  assetId            String
+  asset              Asset    @relation(fields: [assetId], references: [id])
+  employeeId         String
+  employee           Employee @relation(fields: [employeeId], references: [id])
+  departmentId       String?
+  allocatedDate      DateTime @default(now())
+  expectedReturnDate DateTime?
+  returnedDate       DateTime?
+  conditionOnReturn  String?
+  status             String   @default("Active")
+}
+
+model TransferRequest {
+  id             String   @id @default(cuid())
+  assetId        String
+  asset          Asset    @relation(fields: [assetId], references: [id])
+  fromEmployeeId String
+  toEmployeeId   String
+  reason         String?
+  status         String   @default("Requested")
+  requestedBy    String
+  approvedBy     String?
+  createdAt      DateTime @default(now())
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  actionType String
+  entityType String
+  entityId   String
+  description String?
+  timestamp  DateTime @default(now())
+}
