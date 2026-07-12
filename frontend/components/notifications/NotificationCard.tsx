@@ -1,6 +1,7 @@
 'use client';
 
 import { BellRing, CheckCircle2, ClipboardCheck, CalendarCheck2, Truck, AlertTriangle, ShieldAlert, Boxes, XCircle } from 'lucide-react';
+import type { ReactElement } from 'react';
 import type { NotificationItem, NotificationType } from '@/components/notifications/Notifications';
 
 interface NotificationCardProps {
@@ -8,7 +9,7 @@ interface NotificationCardProps {
   onMarkRead: (id: number) => void;
 }
 
-const iconMap: Record<NotificationType, JSX.Element> = {
+const iconMap: Record<NotificationType, ReactElement> = {
   'Maintenance Approved': <CheckCircle2 className="h-5 w-5" />,
   'Booking Confirmed': <CalendarCheck2 className="h-5 w-5" />,
   'Transfer Approved': <Truck className="h-5 w-5" />,

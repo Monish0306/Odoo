@@ -127,54 +127,16 @@ export function RippleButton({
   className,
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement>) {
-  const [ripples, setRipples] = useState<
-    { id: number; x: number; y: number }[]
-  >([]);
-
-  function createRipple(event: React.MouseEvent<HTMLButtonElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-
-    setRipples((current) => [
-      ...current,
-      {
-        id: Date.now(),
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      },
-    ]);
-  }
-
   return (
-    <motion.button
+    <button
       {...props}
       className={cn(
         "relative inline-flex items-center justify-center overflow-hidden rounded-lg px-4 py-2.5 text-sm font-semibold transition",
         className,
       )}
-      whileTap={{ scale: 0.97 }}
-      onClick={(event) => {
-        createRipple(event);
-        props.onClick?.(event);
-      }}
     >
       {children}
-
-      {ripples.map((ripple) => (
-        <motion.span
-          className="pointer-events-none absolute size-3 rounded-full bg-white/35"
-          initial={{ opacity: 0.7, scale: 0 }}
-          animate={{ opacity: 0, scale: 18 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          key={ripple.id}
-          style={{ left: ripple.x - 6, top: ripple.y - 6 }}
-          onAnimationComplete={() =>
-            setRipples((current) =>
-              current.filter((item) => item.id !== ripple.id),
-            )
-          }
-        />
-      ))}
-    </motion.button>
+    </button>
   );
 }
 

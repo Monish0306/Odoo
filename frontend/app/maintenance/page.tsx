@@ -1,136 +1,106 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, Reorder, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
-
-interface MaintenanceCard {
-  id: string;
-  tag: string;
-  description: string;
-  column: 'pending' | 'approved' | 'assigned' | 'progress' | 'resolved';
-  resolvedDate?: string;
-}
-
-const initialCards: MaintenanceCard[] = [
-  { id: '1', tag: 'AF-0062', description: 'Projector bulb not turning on', column: 'pending' },
-  { id: '2', tag: 'AF-003', description: 'AC unit noisy compressor', column: 'approved' },
-  { id: '3', tag: 'AF-0078', description: 'Forklift — tech: R Varma', column: 'assigned' },
-  { id: '4', tag: 'AF-897', description: 'Printer jam — parts ordered', column: 'progress' },
-  { id: '5', tag: 'AF-873', description: 'Chair repair', column: 'resolved', resolvedDate: 'resolved 7 Jul' },
-];
-
-const columnConfig = {
-  pending: { title: 'Pending', id: 'pending' },
-  approved: { title: 'Approved', id: 'approved' },
-  assigned: { title: 'Technician assigned', id: 'assigned' },
-  progress: { title: 'In progress', id: 'progress' },
-  resolved: { title: 'Resolved', id: 'resolved' },
-};
+import AuthGuard from '@/components/AuthGuard';
+import { apiFetch } from '@/lib/api';
 
 export default function Maintenance() {
-  const [cards, setCards] = useState<MaintenanceCard[]>(initialCards);
+  const [requests, setRequests] = useState<any[]>([]);
+  const [assets, setAssets] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [assetId, setAssetId] = useState('');
+  const [issueDescription, setIssueDescription] = useState('');
+  const [message, setMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const getCardsByColumn = (column: MaintenanceCard['column']) => {
-    return cards.filter((card) => card.column === column);
+  useEffect(() => {
+    const loadData = async () => {
+      const [requestsResponse, assetsResponse, employeesResponse] = await Promise.all([apiFetch('/maintenance'), apiFetch('/assets'), apiFetch('/employees')]);
+      if (requestsResponse.data) setRequests(requestsResponse.data as any[]);
+      if (assetsResponse.data) setAssets(assetsResponse.data as any[]);
+      if (employeesResponse.data) setEmployees(employeesResponse.data as any[]);
+      if (assetsResponse.data?.length) setAssetId((assetsResponse.data as any[])[0].id);
+    };
+    loadData();
+  }, []);
+
+  const handleReportIssue = async () => {
+    setIsSubmitting(true);
+    setMessage(null);
+    const response = await apiFetch('/maintenance', { method: 'POST', body: JSON.stringify({ assetId, issueDescription }) });
+    setIsSubmitting(false);
+    if (response.error) {
+      setMessage(response.error);
+      return;
+    }
+    setMessage('Maintenance request reported.');
+    const refreshed = await apiFetch('/maintenance');
+    if (refreshed.data) setRequests(refreshed.data as any[]);
   };
 
-  const handleReorderCards = (newCards: MaintenanceCard[], column: MaintenanceCard['column']) => {
-    const updatedCards = cards.map((card) => {
-      const reorderedCard = newCards.find((nc) => nc.id === card.id);
-      return reorderedCard ? { ...reorderedCard, column } : card;
-    });
-    setCards(updatedCards);
+  const handleApprove = async (id: string) => {
+    const technicianId = employees[0]?.id;
+    const response = await apiFetch(`/maintenance/${id}/approve`, { method: 'PATCH', body: JSON.stringify({ assignedTo: technicianId }) });
+    if (response.error) {
+      setMessage(response.error);
+      return;
+    }
+    setMessage('Maintenance request approved.');
+    const refreshed = await apiFetch('/maintenance');
+    if (refreshed.data) setRequests(refreshed.data as any[]);
   };
 
-  const cardVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 },
+  const handleResolve = async (id: string) => {
+    const response = await apiFetch(`/maintenance/${id}/resolve`, { method: 'PATCH', body: JSON.stringify({ resolutionNotes: 'Resolved through demo flow.' }) });
+    if (response.error) {
+      setMessage(response.error);
+      return;
+    }
+    setMessage('Maintenance request resolved.');
+    const refreshed = await apiFetch('/maintenance');
+    if (refreshed.data) setRequests(refreshed.data as any[]);
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F5F5ED]">
-      <Sidebar />
-      <main className="flex-1 p-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Header
-            title="Maintenance"
-            subtitle="Track repair requests from raised to resolved"
-          />
+    <AuthGuard>
+      <div className="flex min-h-screen bg-[#F5F5ED]">
+        <Sidebar />
+        <main className="flex-1 p-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <Header title="Maintenance" subtitle="Report issues and drive them to resolution" />
 
-          {/* Kanban Board */}
-          <motion.div
-            className="grid grid-cols-5 gap-6 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08, duration: 0.4 }}
-          >
-            {Object.entries(columnConfig).map(([columnKey, columnMeta]) => {
-              const columnCards = getCardsByColumn(columnKey as MaintenanceCard['column']);
-              const isResolved = columnKey === 'resolved';
+            <div className="bg-white border border-[#7AAACE]/20 rounded-lg p-6 mb-6">
+              <h2 className="text-lg font-semibold text-[#2E4F66] mb-4">Report an issue</h2>
+              <select value={assetId} onChange={(e) => setAssetId(e.target.value)} className="w-full px-3 py-2 border rounded-lg mb-3">
+                {assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.tag} — {asset.name}</option>)}
+              </select>
+              <textarea value={issueDescription} onChange={(e) => setIssueDescription(e.target.value)} placeholder="Describe the issue" className="w-full px-3 py-2 border rounded-lg mb-3" rows={3} />
+              {message && <p className="text-sm text-[#2E4F66] mb-3">{message}</p>}
+              <button onClick={handleReportIssue} disabled={isSubmitting} className="px-4 py-2 bg-[#2E4F66] text-white rounded-lg">{isSubmitting ? 'Reporting…' : 'Submit request'}</button>
+            </div>
 
-              return (
-                <div key={columnKey} className="bg-white border border-[#7AAACE]/20 rounded-lg p-5">
-                  <h3 className="text-sm font-semibold text-[#2E4F66] mb-5 tracking-tight" style={{ fontFamily: 'Sentient, serif' }}>
-                    {columnMeta.title}
-                  </h3>
-
-                  <Reorder.Group
-                    axis="y"
-                    values={columnCards}
-                    onReorder={(newOrder) =>
-                      handleReorderCards(newOrder, columnKey as MaintenanceCard['column'])
-                    }
-                    className="space-y-3"
-                  >
-                    <AnimatePresence>
-                      {columnCards.map((card) => (
-                        <Reorder.Item
-                          key={card.id}
-                          value={card}
-                          className="cursor-grab active:cursor-grabbing"
-                        >
-                          <motion.div
-                            layout
-                            variants={cardVariants}
-                            initial="hidden"
-                            animate="visible"
-                            exit="hidden"
-                            className={`p-3.5 rounded-lg border border-[#7AAACE]/20 transition-colors duration-200 ${
-                              isResolved ? 'bg-emerald-50 hover:bg-emerald-100/50' : 'bg-white hover:bg-[#F5F5ED]'
-                            }`}
-                          >
-                            <p className="text-xs font-semibold text-[#2E4F66]">{card.tag}</p>
-                            <p className="text-xs text-gray-600 mt-2 leading-relaxed">{card.description}</p>
-                            {card.resolvedDate && (
-                              <p className="text-xs text-emerald-600 mt-2 font-medium">✓ {card.resolvedDate}</p>
-                            )}
-                          </motion.div>
-                        </Reorder.Item>
-                      ))}
-                    </AnimatePresence>
-                  </Reorder.Group>
-                </div>
-              );
-            })}
+            <div className="bg-white border border-[#7AAACE]/20 rounded-lg p-6">
+              <h2 className="text-lg font-semibold text-[#2E4F66] mb-4">Open requests</h2>
+              <ul className="space-y-3">
+                {requests.map((request) => (
+                  <li key={request.id} className="border border-[#7AAACE]/20 rounded-lg p-4">
+                    <p className="text-sm font-semibold text-[#2E4F66]">{request.asset?.tag || request.assetId}</p>
+                    <p className="text-sm text-gray-700">{request.issueDescription || request.resolutionNotes}</p>
+                    <p className="text-xs text-gray-500 mt-2">Status: {request.status}</p>
+                    <div className="flex gap-2 mt-3">
+                      {request.status === 'Pending' && <button onClick={() => handleApprove(request.id)} className="px-3 py-1 bg-emerald-600 text-white rounded">Approve</button>}
+                      {request.status === 'Assigned' || request.status === 'InProgress' ? <button onClick={() => handleResolve(request.id)} className="px-3 py-1 bg-[#2E4F66] text-white rounded">Resolve</button> : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </motion.div>
-
-          {/* Caption */}
-          <motion.p
-            className="text-xs text-gray-500 font-medium"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
-          >
-            Approving a card moves the asset to Under maintenance. Resolving returns it to Available.
-          </motion.p>
-        </motion.div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </AuthGuard>
   );
 }
