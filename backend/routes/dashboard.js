@@ -26,7 +26,7 @@ router.get('/kpis', auth, async (req, res) => {
       prisma.asset.count(),
       prisma.asset.count({ where: { status: 'Available' } }),
       prisma.asset.count({ where: { status: 'Allocated' } }),
-      prisma.asset.count({ where: { status: 'UnderMaintenance' } }),
+      prisma.asset.count({ where: { status: { in: ['UnderMaintenance', 'Under Maintenance'] } } }),
       prisma.maintenanceRequest.count({
         where: { status: { in: ['Pending', 'Assigned', 'InProgress'] } }
       }),

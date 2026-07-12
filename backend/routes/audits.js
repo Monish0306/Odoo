@@ -222,6 +222,17 @@ router.patch('/discrepancies/:discrepancyId', auth, async (req, res) => {
 
     // If resolved is true and actual status was MISSING, transition the asset status to Lost
     if (resolved && (discrepancy.actualStatus.toUpperCase() === 'MISSING' || discrepancy.actualStatus.toUpperCase() === 'LOST')) {
+      const activeAllocations = await prisma.allocation.findMany({
+        where: { assetId: discrepancy.assetId, status: 'Active' },
+      });
+
+      for (const allocation of activeAllocations) {
+        await prisma.allocation.update({
+          where: { id: allocation.id },
+          data: { status: 'Returned', returnedDate: new Date() },
+        });
+      }
+
       await transitionAssetStatus(
         discrepancy.assetId,
         'Lost',
