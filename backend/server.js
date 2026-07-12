@@ -25,6 +25,10 @@ const transferRoutes = require('./routes/transfers');
 const bookingRoutes = require('./routes/bookings');
 const maintenanceRoutes = require('./routes/maintenance');
 const auditRoutes = require('./routes/audits');
+const notificationRoutes = require('./routes/notifications');
+const activityLogRoutes = require('./routes/activityLogs');
+const dashboardRoutes = require('./routes/dashboard');
+const reportRoutes = require('./routes/reports');
 
 app.use('/auth', authRoutes);
 app.use('/', organizationRoutes);
@@ -34,6 +38,10 @@ app.use('/', transferRoutes);
 app.use('/bookings', bookingRoutes);
 app.use('/maintenance', maintenanceRoutes);
 app.use('/audits', auditRoutes);
+app.use('/notifications', notificationRoutes);
+app.use('/activity-logs', activityLogRoutes);
+app.use('/dashboard', dashboardRoutes);
+app.use('/reports', reportRoutes);
 
 // Health check
 app.get('/', (req, res) => {
