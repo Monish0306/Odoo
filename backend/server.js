@@ -23,6 +23,7 @@ const assetRoutes = require('./routes/assets');
 const allocationRoutes = require('./routes/allocations');
 const transferRoutes = require('./routes/transfers');
 const bookingRoutes = require('./routes/bookings');
+const maintenanceRoutes = require('./routes/maintenance');
 
 app.use('/auth', authRoutes);
 app.use('/', organizationRoutes);
@@ -30,6 +31,7 @@ app.use('/', assetRoutes);
 app.use('/', allocationRoutes);
 app.use('/', transferRoutes);
 app.use('/bookings', bookingRoutes);
+app.use('/maintenance', maintenanceRoutes);
 
 // Health check
 app.get('/', (req, res) => {
