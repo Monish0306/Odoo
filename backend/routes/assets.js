@@ -3,7 +3,10 @@ const router = express.Router();
 const prisma = require('../services/prisma');
 const auth = require('../middleware/auth');
 const requireRole = require('../middleware/requireRole');
-const { transitionAssetStatus } = require('../services/assetStatusService');
+const { isNonEmptyString, isValidDateString, isValidNumber, isValidEnum } = require('../utils/validation');
+
+const allowedConditions = ['Excellent', 'Good', 'Fair', 'Poor'];
+const allowedStatuses = ['Available', 'Allocated', 'Under Maintenance', 'Disposed'];
 
 function buildTag() {
   return `AF-${String(nextNumber).padStart(4, '0')}`;
@@ -28,6 +31,7 @@ async function getNextTag() {
 
 router.post('/assets', auth, requireRole('AssetManager', 'Admin'), async (req, res) => {
   try {
+    const body = req.body || {};
     const {
       name,
       categoryId,
@@ -39,10 +43,26 @@ router.post('/assets', auth, requireRole('AssetManager', 'Admin'), async (req, r
       photoUrl,
       isBookable,
       departmentId,
-    } = req.body;
+    } = body;
 
-    if (!name || !categoryId) {
-      return res.status(400).json({ data: null, error: 'Name and categoryId are required' });
+    if (!isNonEmptyString(name)) {
+      return res.status(400).json({ data: null, error: 'Name is required' });
+    }
+
+    if (!isNonEmptyString(categoryId)) {
+      return res.status(400).json({ data: null, error: 'categoryId is required' });
+    }
+
+    if (acquisitionDate !== undefined && acquisitionDate !== null && !isValidDateString(acquisitionDate)) {
+      return res.status(400).json({ data: null, error: 'acquisitionDate must be a valid date string' });
+    }
+
+    if (acquisitionCost !== undefined && acquisitionCost !== null && !isValidNumber(Number(acquisitionCost))) {
+      return res.status(400).json({ data: null, error: 'acquisitionCost must be a valid number' });
+    }
+
+    if (condition !== undefined && condition !== null && !isValidEnum(condition, allowedConditions)) {
+      return res.status(400).json({ data: null, error: 'condition must be one of Excellent, Good, Fair, or Poor' });
     }
 
     const tag = await getNextTag();

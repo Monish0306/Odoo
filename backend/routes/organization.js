@@ -3,6 +3,7 @@ const router = express.Router();
 const prisma = require('../services/prisma');
 const auth = require('../middleware/auth');
 const requireRole = require('../middleware/requireRole');
+const { isNonEmptyString, isValidEnum } = require('../utils/validation');
 
 const allowedRoles = ['Employee', 'DeptHead', 'AssetManager', 'Admin'];
 
@@ -28,10 +29,19 @@ router.get('/departments', auth, async (req, res) => {
 
 router.post('/departments', auth, requireRole('Admin'), async (req, res) => {
   try {
-    const { name, headId, parentDeptId } = req.body;
+    const body = req.body || {};
+    const { name, headId, parentDeptId } = body;
 
-    if (!name) {
+    if (!isNonEmptyString(name)) {
       return res.status(400).json({ data: null, error: 'Department name is required' });
+    }
+
+    if (headId !== undefined && headId !== null && !isNonEmptyString(headId)) {
+      return res.status(400).json({ data: null, error: 'headId must be a non-empty string when provided' });
+    }
+
+    if (parentDeptId !== undefined && parentDeptId !== null && !isNonEmptyString(parentDeptId)) {
+      return res.status(400).json({ data: null, error: 'parentDeptId must be a non-empty string when provided' });
     }
 
     const department = await prisma.department.create({
@@ -88,7 +98,7 @@ router.post('/categories', auth, requireRole('Admin'), async (req, res) => {
   try {
     const { name, customFields } = req.body;
 
-    if (!name) {
+    if (!isNonEmptyString(name)) {
       return res.status(400).json({ data: null, error: 'Category name is required' });
     }
 
@@ -109,7 +119,8 @@ router.post('/categories', auth, requireRole('Admin'), async (req, res) => {
 router.patch('/categories/:id', auth, requireRole('Admin'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, customFields } = req.body;
+    const body = req.body || {};
+    const { name, customFields } = body;
 
     const category = await prisma.category.update({
       where: { id },
@@ -150,9 +161,10 @@ router.get('/employees', auth, async (req, res) => {
 router.patch('/employees/:id/promote', auth, requireRole('Admin'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { role } = req.body;
+    const body = req.body || {};
+    const { role } = body;
 
-    if (!role || !allowedRoles.includes(role)) {
+    if (!isValidEnum(role, allowedRoles)) {
       return res.status(400).json({ data: null, error: 'Role must be one of Employee, DeptHead, AssetManager, or Admin' });
     }
 

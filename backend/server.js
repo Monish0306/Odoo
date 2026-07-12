@@ -4,8 +4,13 @@ const cors = require('cors');
 
 const app = express();
 
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: allowedOrigins,
   credentials: true
 }));
 
@@ -27,6 +32,11 @@ app.use('/', transferRoutes);
 // Health check
 app.get('/', (req, res) => {
   res.json({ data: { message: 'AssetFlow API is running' }, error: null });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ data: null, error: 'Internal server error' });
 });
 
 const PORT = process.env.PORT || 5000;
