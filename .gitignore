@@ -2,3 +2,6 @@ node_modules/
 .env
 
 /generated/prisma
+
+backend/node_modules/
+backend/.env
