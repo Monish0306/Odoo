@@ -6,7 +6,7 @@ const requireRole = require('../middleware/requireRole');
 const { isNonEmptyString, isValidDateString, isValidNumber, isValidEnum } = require('../utils/validation');
 
 const allowedConditions = ['Excellent', 'Good', 'Fair', 'Poor'];
-const allowedStatuses = ['Available', 'Allocated', 'Under Maintenance', 'Disposed'];
+const allowedStatuses = ['Available', 'Allocated', 'UnderMaintenance', 'Lost', 'Disposed'];
 
 function buildTag() {
   return `AF-${String(nextNumber).padStart(4, '0')}`;
