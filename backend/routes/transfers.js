@@ -3,13 +3,19 @@ const router = express.Router();
 const prisma = require('../services/prisma');
 const auth = require('../middleware/auth');
 const requireRole = require('../middleware/requireRole');
+const { isNonEmptyString } = require('../utils/validation');
 
 router.post('/transfers', auth, async (req, res) => {
   try {
-    const { assetId, toEmployeeId, reason } = req.body;
+    const body = req.body || {};
+    const { assetId, toEmployeeId, reason } = body;
 
-    if (!assetId || !toEmployeeId) {
-      return res.status(400).json({ data: null, error: 'assetId and toEmployeeId are required' });
+    if (!isNonEmptyString(assetId)) {
+      return res.status(400).json({ data: null, error: 'assetId is required' });
+    }
+
+    if (!isNonEmptyString(toEmployeeId)) {
+      return res.status(400).json({ data: null, error: 'toEmployeeId is required' });
     }
 
     const activeAllocation = await prisma.allocation.findFirst({

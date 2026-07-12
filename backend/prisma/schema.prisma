@@ -40,10 +40,12 @@ model Employee {
   createdAt      DateTime @default(now())
 
   // Relations for Dev B
-  bookings       Booking[]
-  raisedRequests MaintenanceRequest[]
-  auditedCycles  AuditCycleAuditor[]
-  notifications  Notification[]
+  bookings            Booking[]
+  reportedMaintenance MaintenanceRequest[] @relation("MaintReporter")
+  assignedMaintenance MaintenanceRequest[] @relation("MaintAssignee")
+  auditAssignments    AuditAssignment[]
+  notifications       Notification[]
+  activityLogs        ActivityLog[]
 }
 
 model Asset {
@@ -67,9 +69,9 @@ model Asset {
   createdAt      DateTime @default(now())
 
   // Relations for Dev B
-  bookings       Booking[]
+  bookings            Booking[]
   maintenanceRequests MaintenanceRequest[]
-  auditItems     AuditItem[]
+  auditDiscrepancies  AuditDiscrepancy[]
 }
 
 model Allocation {
@@ -99,114 +101,84 @@ model TransferRequest {
   createdAt      DateTime @default(now())
 }
 
-model ActivityLog {
-  id         String   @id @default(cuid())
-  actorId    String
-  actionType String
-  entityType String
-  entityId   String
-  description String?
-  timestamp  DateTime @default(now())
-}
-
 model Booking {
-  id           String   @id @default(cuid())
-  assetId      String
-  asset        Asset    @relation(fields: [assetId], references: [id])
-  bookedById   String
-  bookedBy     Employee @relation(fields: [bookedById], references: [id])
-  startTime    DateTime
-  endTime      DateTime
-  status       BookingStatus @default(UPCOMING)
-  createdAt    DateTime @default(now())
-}
-
-enum BookingStatus {
-  UPCOMING
-  ONGOING
-  COMPLETED
-  CANCELLED
-}
-
-model MaintenanceRequest {
   id            String   @id @default(cuid())
   assetId       String
   asset         Asset    @relation(fields: [assetId], references: [id])
-  raisedById    String
-  raisedBy      Employee @relation(fields: [raisedById], references: [id])
-  issue         String
-  priority      Priority @default(MEDIUM)
-  photoUrl      String?
-  status        MaintenanceStatus @default(PENDING)
-  technicianId  String?
-  approvedById  String?
+  employeeId    String
+  employee      Employee @relation(fields: [employeeId], references: [id])
+  startTime     DateTime
+  endTime       DateTime
+  purpose       String?
+  status        String   @default("Confirmed") // Confirmed, Cancelled, Completed
   createdAt     DateTime @default(now())
-  resolvedAt    DateTime?
 }
 
-enum Priority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
-
-enum MaintenanceStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  ASSIGNED
-  IN_PROGRESS
-  RESOLVED
+model MaintenanceRequest {
+  id             String   @id @default(cuid())
+  assetId        String
+  asset          Asset    @relation(fields: [assetId], references: [id])
+  reportedBy     String
+  reporter       Employee @relation("MaintReporter", fields: [reportedBy], references: [id])
+  issueDescription String
+  status         String   @default("Pending") // Pending, Approved, Rejected, Assigned, InProgress, Resolved
+  assignedTo     String?
+  assignee       Employee? @relation("MaintAssignee", fields: [assignedTo], references: [id])
+  approvedBy     String?
+  resolutionNotes String?
+  createdAt      DateTime @default(now())
+  resolvedAt     DateTime?
 }
 
 model AuditCycle {
   id           String   @id @default(cuid())
-  scopeDeptId  String?
-  location     String?
-  startDate    DateTime
-  endDate      DateTime
-  status       AuditStatus @default(OPEN)
-  auditors     AuditCycleAuditor[]
-  items        AuditItem[]
-  createdAt    DateTime @default(now())
+  name         String
+  status       String   @default("Open") // Open, Closed
+  createdBy    String
+  startDate    DateTime @default(now())
+  closedDate   DateTime?
+  discrepancies AuditDiscrepancy[]
+  auditors     AuditAssignment[]
 }
 
-enum AuditStatus {
-  OPEN
-  CLOSED
-}
-
-model AuditCycleAuditor {
+model AuditAssignment {
   id           String   @id @default(cuid())
   auditCycleId String
   auditCycle   AuditCycle @relation(fields: [auditCycleId], references: [id])
-  employeeId   String
-  employee     Employee @relation(fields: [employeeId], references: [id])
+  auditorId    String
+  auditor      Employee @relation(fields: [auditorId], references: [id])
 }
 
-model AuditItem {
+model AuditDiscrepancy {
   id           String   @id @default(cuid())
   auditCycleId String
   auditCycle   AuditCycle @relation(fields: [auditCycleId], references: [id])
   assetId      String
   asset        Asset    @relation(fields: [assetId], references: [id])
-  result       AuditResult?
+  expectedStatus String
+  actualStatus   String
   notes        String?
-}
-
-enum AuditResult {
-  VERIFIED
-  MISSING
-  DAMAGED
+  resolved     Boolean  @default(false)
+  createdAt    DateTime @default(now())
 }
 
 model Notification {
+  id        String   @id @default(cuid())
+  employeeId String
+  employee  Employee @relation(fields: [employeeId], references: [id])
+  message   String
+  type      String   // e.g. "MaintenanceAssigned", "BookingConfirmed", "TransferApproved"
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ActivityLog {
   id          String   @id @default(cuid())
-  employeeId  String
-  employee    Employee @relation(fields: [employeeId], references: [id])
-  type        String
-  message     String
-  read        Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  actorId     String
+  actor       Employee @relation(fields: [actorId], references: [id])
+  actionType  String   // Matches Dev A's actionType column
+  entityType  String   // e.g. "Asset", "Booking"
+  entityId    String
+  description String?  // Matches Dev A's description column
+  timestamp   DateTime @default(now()) // Matches Dev A's timestamp column
 }

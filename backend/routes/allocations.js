@@ -2,14 +2,24 @@ const express = require('express');
 const router = express.Router();
 const prisma = require('../services/prisma');
 const auth = require('../middleware/auth');
+const { isNonEmptyString, isValidDateString } = require('../utils/validation');
 const { transitionAssetStatus } = require('../services/assetStatusService');
 
 router.post('/allocations', auth, async (req, res) => {
   try {
-    const { assetId, employeeId, expectedReturnDate } = req.body;
+    const body = req.body || {};
+    const { assetId, employeeId, expectedReturnDate } = body;
 
-    if (!assetId || !employeeId) {
-      return res.status(400).json({ data: null, error: 'assetId and employeeId are required' });
+    if (!isNonEmptyString(assetId)) {
+      return res.status(400).json({ data: null, error: 'assetId is required' });
+    }
+
+    if (!isNonEmptyString(employeeId)) {
+      return res.status(400).json({ data: null, error: 'employeeId is required' });
+    }
+
+    if (expectedReturnDate !== undefined && expectedReturnDate !== null && !isValidDateString(expectedReturnDate)) {
+      return res.status(400).json({ data: null, error: 'expectedReturnDate must be a valid date string' });
     }
 
     const asset = await prisma.asset.findUnique({ where: { id: assetId }, select: { id: true, status: true } });
@@ -65,7 +75,8 @@ router.post('/allocations', auth, async (req, res) => {
 router.post('/allocations/:id/return', auth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { conditionOnReturn } = req.body;
+    const body = req.body || {};
+    const { conditionOnReturn } = body;
 
     const allocation = await prisma.allocation.findUnique({ where: { id } });
     if (!allocation) {
