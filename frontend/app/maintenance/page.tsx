@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import AuthGuard from '@/components/AuthGuard';
+import StatusPill from '@/components/StatusPill';
 import { apiFetch } from '@/lib/api';
 
 export default function Maintenance() {
@@ -37,12 +38,16 @@ export default function Maintenance() {
       return;
     }
     setMessage('Maintenance request reported.');
+    setIssueDescription('');
     const refreshed = await apiFetch('/maintenance');
     if (refreshed.data) setRequests(refreshed.data as any[]);
   };
 
-  const handleApprove = async (id: string) => {
-    const technicianId = employees[0]?.id;
+  const handleApprove = async (id: string, technicianId: string) => {
+    if (!technicianId) {
+      setMessage('Please select a technician to assign.');
+      return;
+    }
     const response = await apiFetch(`/maintenance/${id}/approve`, { method: 'PATCH', body: JSON.stringify({ assignedTo: technicianId }) });
     if (response.error) {
       setMessage(response.error);
@@ -54,7 +59,8 @@ export default function Maintenance() {
   };
 
   const handleResolve = async (id: string) => {
-    const response = await apiFetch(`/maintenance/${id}/resolve`, { method: 'PATCH', body: JSON.stringify({ resolutionNotes: 'Resolved through demo flow.' }) });
+    const notes = prompt('Enter resolution notes:') || 'Resolved through demo flow.';
+    const response = await apiFetch(`/maintenance/${id}/resolve`, { method: 'PATCH', body: JSON.stringify({ resolutionNotes: notes }) });
     if (response.error) {
       setMessage(response.error);
       return;
@@ -83,16 +89,64 @@ export default function Maintenance() {
             </div>
 
             <div className="bg-white border border-[#7AAACE]/20 rounded-lg p-6">
-              <h2 className="text-lg font-semibold text-[#2E4F66] mb-4">Open requests</h2>
-              <ul className="space-y-3">
+              <h2 className="text-lg font-semibold text-[#2E4F66] mb-4" style={{ fontFamily: 'Sentient, serif' }}>Open requests</h2>
+              <ul className="space-y-4">
                 {requests.map((request) => (
-                  <li key={request.id} className="border border-[#7AAACE]/20 rounded-lg p-4">
-                    <p className="text-sm font-semibold text-[#2E4F66]">{request.asset?.tag || request.assetId}</p>
-                    <p className="text-sm text-gray-700">{request.issueDescription || request.resolutionNotes}</p>
-                    <p className="text-xs text-gray-500 mt-2">Status: {request.status}</p>
-                    <div className="flex gap-2 mt-3">
-                      {request.status === 'Pending' && <button onClick={() => handleApprove(request.id)} className="px-3 py-1 bg-emerald-600 text-white rounded">Approve</button>}
-                      {request.status === 'Assigned' || request.status === 'InProgress' ? <button onClick={() => handleResolve(request.id)} className="px-3 py-1 bg-[#2E4F66] text-white rounded">Resolve</button> : null}
+                  <li key={request.id} className="border border-[#7AAACE]/20 rounded-lg p-5 bg-white hover:shadow-sm transition-shadow duration-200">
+                    <div className="flex justify-between items-start gap-4 mb-2">
+                      <div>
+                        <p className="text-sm font-semibold text-[#2E4F66]">{request.asset?.name || 'Asset ID: ' + request.assetId} ({request.asset?.tag || 'No Tag'})</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Reported by: {request.reporter?.name || 'Unknown'}</p>
+                      </div>
+                      <StatusPill status={request.status} />
+                    </div>
+                    <p className="text-sm text-gray-700 mt-2 bg-gray-50 p-2.5 rounded border border-[#7AAACE]/10 font-mono text-xs">{request.issueDescription}</p>
+                    
+                    {request.resolutionNotes && (
+                      <p className="text-sm text-[#2E4F66] mt-2 bg-emerald-50/50 p-2.5 rounded border border-emerald-200/30 text-xs font-mono">
+                        **Resolution**: {request.resolutionNotes}
+                      </p>
+                    )}
+
+                    <div className="flex gap-3 mt-4 items-center justify-between pt-3 border-t border-[#7AAACE]/10">
+                      <div>
+                        {request.assignee && (
+                          <p className="text-xs text-gray-500">Assigned To: **{request.assignee.name}**</p>
+                        )}
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        {request.status === 'Pending' && (
+                          <div className="flex items-center gap-2">
+                            <select
+                              id={`tech-select-${request.id}`}
+                              className="px-2 py-1 border border-[#7AAACE]/20 rounded text-xs bg-white text-gray-700 focus:outline-none"
+                            >
+                              <option value="">Select Tech</option>
+                              {employees.map((emp) => (
+                                <option key={emp.id} value={emp.id}>{emp.name}</option>
+                              ))}
+                            </select>
+                            <button
+                              onClick={() => {
+                                const selectEl = document.getElementById(`tech-select-${request.id}`) as HTMLSelectElement;
+                                const techId = selectEl?.value || employees[0]?.id;
+                                if (techId) handleApprove(request.id, techId);
+                              }}
+                              className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs transition-colors font-medium"
+                            >
+                              Approve
+                            </button>
+                          </div>
+                        )}
+                        {(request.status === 'Assigned' || request.status === 'InProgress') && (
+                          <button
+                            onClick={() => handleResolve(request.id)}
+                            className="px-3 py-1.5 bg-[#2E4F66] hover:bg-[#1a2f42] text-white rounded text-xs transition-colors font-medium"
+                          >
+                            Resolve Request
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </li>
                 ))}
